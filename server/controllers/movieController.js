@@ -1,31 +1,69 @@
-const movieModel = require('../models/movieModel.js');
-const apiHelpers = require('../helpers/apiHelpers.js');
-
-//Return requests to the client
+const movieModel = require("../models/movieModel.js");
+const apiHelpers = require("../helpers/apiHelpers.js");
+const desiredDB = "mongoDB";
+//CHANGE DATABASES BY CHANGING THE desiredDB VARIABLE TO <mySQL, mongoDB>
 module.exports = {
   getSearch: (req, res) => {
-    // get the search genre     
-
-    // https://www.themoviedb.org/account/signup
-    // get your API KEY
-
-    // use this endpoint to search for movies by genres, you will need an API key
-
-    // https://api.themoviedb.org/3/discover/movie
-
-    // and sort them by horrible votes using the search parameters in the API
+    console.log("GET-SEARCH requested!");
+    apiHelpers
+      .getMovies(req.body.genre_id)
+      .then(data => {
+        res.send(data);
+      })
+      .catch(err => {
+        res.sendStatus(500);
+        console.log(`Error with getting movies of genre: `, req.body.genre_id);
+      });
   },
+
   getGenres: (req, res) => {
-    // make an axios request to get the list of official genres
-    
-    // use this endpoint, which will also require your API key: https://api.themoviedb.org/3/genre/movie/list
-    
-    // send back
+    console.log("GET-GENRES requested!");
+    apiHelpers
+      .getGenres()
+      .then(data => {
+        res.send(data);
+      })
+      .catch(err => {
+        res.sendStatus(500);
+        console.log("Error with getting genres!");
+      });
   },
-  saveMovie: (req, res) => {
 
+  getFavorites: (req, res) => {
+    console.log("GET FAVORITES requested!");
+    movieModel[desiredDB]
+      .favorites()
+      .then(data => {
+        res.send(data);
+      })
+      .catch(err => {
+        res.sendStatus(500);
+        console.log("Error with getting favorite movies!");
+      });
+  },
+
+  saveMovie: (req, res) => {
+    console.log("SAVE-MOVIE requested!");
+    movieModel[desiredDB]
+      .save(req.body)
+      .then(data => {
+        res.sendStatus(201);
+      })
+      .catch(err => {
+        res.sendStatus(500);
+        console.log("Error with saving a movie!");
+      });
   },
   deleteMovie: (req, res) => {
-
+    console.log("DELETE-MOVIE requested!");
+    movieModel[desiredDB]
+      .delete(req.body)
+      .then(data => {
+        res.sendStatus(201);
+      })
+      .catch(err => {
+        res.sendStatus(500);
+        console.log("Error with deleting a movie!");
+      });
   }
-}
+};

@@ -1,53 +1,78 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import ReactDOM from 'react-dom';
-import $ from 'jquery';
+import axios from 'axios';
 // import AnyComponent from './components/filename.jsx'
 import Search from './components/Search.jsx'
-import Movies from './components/Movies.jsx'
+import MoviesList from './components/MoviesList.jsx'
 
-class App extends React.Component {
-  constructor(props) {
-  	super(props)
-  	this.state = {
-      movies: [{deway: "movies"}],
-      favorites: [{deway: "favorites"}],
-      showFaves: false,
-    };
-    
-    // you might have to do something important here!
+const App = () =>{
+
+  const [movieList, setMovieList] = useState([]);
+  const [genreList, setGenreList] = useState([]);
+  const [showFavorites, setShowFavorites] = useState(false);
+
+  const showFavesFunc = (e) =>{
+    axios.get('http://localhost:3000/movies/host')
+    .then((data) =>{
+      setMovieList(data.data);
+    })
+    .then(() =>{
+      setShowFavorites(true);
+    })
+    .catch((err) =>{
+      console.log('Error getting the FAVORITE MOVIES!')
+    })
   }
 
-  getMovies() {
-    // make an axios request to your server on the GET SEARCH endpoint
+  const saveMovie = (movie) =>{
+    axios.post('http://localhost:3000/movies/host', movie)
+    .catch((err) =>{
+      console.log('Error with SAVING MOVIE!')
+    })
   }
 
-  saveMovie() {
-    // same as above but do something diff
+  const deleteMovie = (movie) =>{
+    console.log(movie)
+    axios.put('http://localhost:3000/movies/host', movie)
+    .then(() =>{
+      return axios.get('http://localhost:3000/movies/host')
+    })
+    .then((data) =>{
+      setMovieList(data.data);
+    })
+    .catch((err) =>{
+      console.log('Error with DELETING MOVIE!')
+    })
   }
 
-  deleteMovie() {
-    // same as above but do something diff
-  }
+  useEffect(() =>{
+    axios.get('http://localhost:3000/movies/genres')
+    .then((data) =>{
+      setGenreList(data.data)
+    })
+    .catch((err) =>{
+      console.log('Error getting the list of GENRES!')
+    })
+    .then(() =>{
+      return axios.post('http://localhost:3000/movies/search',{genre_id: 12})
+    })
+    .then((data) =>{
+      setMovieList(data.data);
+    })
+    .catch((err) =>{
+      console.log('Error with getting the INITIAL MOVIES of genre ACTION(id:28)!')
+    })
+  },[])
 
-  swapFavorites() {
-  //dont touch
-    this.setState({
-      showFaves: !this.state.showFaves
-    });
-  }
-
-  render () {
-  	return (
-      <div className="app">
+  return (
+    <div className="app">
         <header className="navbar"><h1>Bad Movies</h1></header> 
-        
         <div className="main">
-          <Search swapFavorites={this.swapFavorites} showFaves={this.state.showFaves}/>
-          <Movies movies={this.state.showFaves ? this.state.favorites : this.state.movies} showFaves={this.state.showFaves}/>
+          <Search genreList={genreList} showFavesFunc={showFavesFunc} setShowFavorites={setShowFavorites} setMovieList={setMovieList} showFavorites={showFavorites}/>
+          <MoviesList movies={movieList} showFavorites={showFavorites} saveMovie={saveMovie} deleteMovie={deleteMovie}/>
         </div>
       </div>
-    );
-  }
+  )
 }
 
 ReactDOM.render(<App />, document.getElementById('app'));

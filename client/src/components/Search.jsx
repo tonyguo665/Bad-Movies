@@ -1,37 +1,49 @@
 import React from 'react';
+import axios from 'axios';
+import $ from 'jquery';
 
-class Search extends React.Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      genres: []
-    };
-  }
-  getGenres() {
-    //make an axios request in this component to get the list of genres from your endpoint GET GENRES
+
+const Search = (props) =>{
+
+  const clickHandleFavorites = (e) => {
+    props.showFavesFunc();
   }
 
-  render() {
-    return (
-      <div className="search">
-        <button onClick={() => {this.props.swapFavorites()}}>{this.props.showFaves ? "Show Results" : "Show Favorites"}</button>
-        <br/><br/>
-
-        {/* Make the select options dynamic from genres !!! */}
-        {/* How can you tell which option has been selected from here? */}
-
-        <select>
-          <option value="theway">The Way</option>
-          <option value="thisway">This Way</option>
-          <option value="thatway">That Way</option>
-        </select>
-        <br/><br/>
-
-        <button>Search</button>
-
-      </div>
-    );
+  const clickHandleSearch = (e) => {
+    let target = $('#search-input').val();
+    let movieGenre = {genre_id:target};
+    axios.post('http://localhost:3000/movies/search',movieGenre)
+    .then((data) =>{
+      props.setMovieList(data.data)
+      props.setShowFavorites(false)
+    })
+    .catch((err) =>{
+      console.log('Error with SEARCH MOVIES!')
+    })
   }
+
+  return (
+    <div className="search">
+      <button onClick={clickHandleFavorites}>Show Favorites</button>
+      <br/><br/>
+      <select id='search-input'>
+        {
+          props.genreList.map((genre) =>(
+            <SearchOption genre={genre}/>
+          ))
+        }
+      </select>
+      <br/><br/>
+      <button onClick={clickHandleSearch}>Search</button>
+    </div>
+  );
+}
+
+const SearchOption = (props) =>{
+
+  return(
+    <option value={props.genre.id}>{props.genre.name}</option>
+  )
 }
 
 export default Search;
