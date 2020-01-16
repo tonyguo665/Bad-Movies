@@ -3,8 +3,6 @@ import MovieListEntry from './MoviesListEntry.jsx';
 
 const MoviesList = (props) =>{
   const clickHandler = (movie) =>{
-    console.log('This was Clicked: ', movie)
-    console.log(props.showFavorites)
     if(props.showFavorites){
       props.deleteMovie(movie);
     }else{

@@ -54,7 +54,7 @@ const App = () =>{
       console.log('Error getting the list of GENRES!')
     })
     .then(() =>{
-      return axios.post('http://localhost:3000/movies/search',{genre_id: 12})
+      return axios.post('http://localhost:3000/movies/search',{genre_id: 28})
     })
     .then((data) =>{
       setMovieList(data.data);

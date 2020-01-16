@@ -2,12 +2,12 @@ const mongoose = require("mongoose");
 
 mongoose.connect("mongodb://localhost:27017/badmovies");//makes connection
 
-const db = mongoose.connection;//makes connection
+// const db = mongoose.connection;//makes connection
 
-db.on("error", console.error.bind(console, "Connection error:"));
-db.once("open", () => {
-  console.log("Connected to db...");
-});
+// db.on("error", console.error.bind(console, "Connection error:"));
+// db.once("open", () => {
+//   console.log("Connected to db...");
+// });
 
 movieSchema = mongoose.Schema({
   movie_id: Number,
@@ -29,7 +29,7 @@ module.exports.save = movie => {
     movie_description: movie.overview,
     movie_year: movie.release_date
   });
-  return newMovie.save().exec();
+  return newMovie.save();
 };
 
 module.exports.delete = movie => {
